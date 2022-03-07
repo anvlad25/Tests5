@@ -66,10 +66,9 @@ class BehaviorTest {
         val editText = uiDevice.findObject(By.res(packageName, "searchEditText"))
         //Устанавливаем значение
         editText.text = "UiAutomator"
-        //Отправляем запрос через Espresso
-        Espresso.onView(ViewMatchers.withId(R.id.searchEditText))
-            .perform(ViewActions.pressImeActionButton())
 
+        val searchButton = uiDevice.findObject(By.res(packageName, "searchButton"))
+        searchButton.click()
         //Ожидаем конкретного события: появления текстового поля totalCountTextView.
         //Это будет означать, что сервер вернул ответ с какими-то данными, то есть запрос отработал.
         val changedText =
@@ -79,7 +78,51 @@ class BehaviorTest {
             )
         //Убеждаемся, что сервер вернул корректный результат. Обратите внимание, что количество
         //результатов может варьироваться во времени, потому что количество репозиториев постоянно меняется.
-        Assert.assertEquals(changedText.text.toString(), "Number of results: 668")
+        Assert.assertEquals(changedText.text.toString(), "Number of results: 700")
+    }
+
+    @Test
+    fun test_Search_OpenDetails() {
+        val editText = uiDevice.findObject(By.res(packageName, "searchEditText"))
+        val searchButton = uiDevice.findObject(By.res(packageName, "searchButton"))
+        val toDetails = uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
+
+        editText.text = "UiAutomator"
+        searchButton.click()
+        Thread.sleep(2000)
+        toDetails.click()
+
+        val changedText =
+             uiDevice.wait(
+                 Until.findObject(By.res(packageName, "totalCountTextView")),
+                 TIMEOUT
+             )
+
+         Assert.assertEquals(changedText.text, "Number of results: 700")
+    }
+
+    @Test
+    fun test_Search_OpenDetails_ButtonClick() {
+        val editText = uiDevice.findObject(By.res(packageName, "searchEditText"))
+        val searchButton = uiDevice.findObject(By.res(packageName, "searchButton"))
+        val toDetails = uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
+
+        editText.text = "UiAutomator"
+        searchButton.click()
+        Thread.sleep(2000)
+        toDetails.click()
+
+        val changedText =
+            uiDevice.wait(
+                Until.findObject(By.res(packageName, "totalCountTextView")),
+                TIMEOUT
+            )
+        Espresso.onView(ViewMatchers.withId(R.id.incrementButton)).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.incrementButton)).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.incrementButton)).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.decrementButton)).perform(ViewActions.click())
+
+        Assert.assertEquals(changedText.text, "Number of results: 702")
     }
 
     //Убеждаемся, что DetailsScreen открывается
